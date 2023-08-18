@@ -1,22 +1,22 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const apiRoutes = require("./apiRoutes");
-const Redis = require("ioredis");
+const apiRoutes = require("./routes/apiRoutes");
+//const Redis = require("ioredis");
 
 const app = express();
 const port = 3000;
 
-const redisClient = new Redis();
+//const redisClient = new Redis();
 
 app.use(bodyParser.json());
 
 app.use("/api", apiRoutes);
 
-redisClient.on("connect", () => {
-  console.log("Connected to Redis");
-});
+// redisClient.on("connect", () => {
+//   console.log("Connected to Redis");
+// });
 
-const db = require("../models/db");
+const db = require("./models/db");
 db.connect((err) => {
   if (err) {
     console.error("Error connecting to MySQL: " + err.stack);
