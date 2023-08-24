@@ -12,8 +12,8 @@
 const mysql = require("mysql");
 
 const db = mysql.createConnection({
-  host: "hcontainers-us-west-154.railway.app",
-  port: 7527,
+  host: "containers-us-west-154.railway.app",
+  port: "7527",
   user: "root",
   password: "1q18KXxgh0XVoIVBsqlf",
   database: "railway",
