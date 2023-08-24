@@ -16,7 +16,7 @@ This application provides a simple backend service to manage users and their res
 
 ## Creating Database Table
 
-[https://cobalt-blue-nightingale-vest.cyclic.cloud/api/users/1]
+[https://cobalt-blue-nightingale-vest.cyclic.cloud]
 
 ![table](2.png)
 
