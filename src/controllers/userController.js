@@ -1,17 +1,26 @@
 const db = require("../models/db");
-const Redis = require("ioredis"); // Mengimpor ioredis
+const redisClient = require("../models/redis"); // Mengimpor ioredis
 
-// Get user information with balance and total expenses
-exports.getUserInfo = (req, res) => {
+exports.getAllUser = (req, res) => {
+  const sql = "SELECT * FROM users";
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: "An error occurred while fetching users" });
+    } else {
+      res.json(result);
+    }
+  });
+};
+
+exports.getUserById = (req, res) => {
   const userId = req.params.id;
 
-  // Membuat koneksi Redis menggunakan ioredis
-  const redisClient = new Redis();
+  const redisKey = `user:${userId}`;
 
-  // Fetch data from Redis cache
-  redisClient.get(userId, (redisErr, cachedData) => {
-    if (cachedData) {
-      res.json(JSON.parse(cachedData));
+  redisClient.hgetall(redisKey, (redisErr, cachedData) => {
+    if (cachedData && Object.keys(cachedData).length > 0) {
+      res.json(cachedData);
       console.log("get data from cache");
     } else {
       const sql =
@@ -37,10 +46,18 @@ exports.getUserInfo = (req, res) => {
             expense: result[0].total_expense,
           };
 
-          // Set data in Redis cache
-          redisClient.setex(userId, 3600, JSON.stringify(userData)); // Cache for 1 hour
+          // Set data in Redis cache as a hash using HMSET
+          redisClient.hmset(redisKey, userData, (hmsetErr, reply) => {
+            if (hmsetErr) {
+              console.error(hmsetErr);
+            } else {
+              // Set an expiration time for the hash in Redis (TTL: 1 hour)
+              redisClient.expire(redisKey, 3600);
+              console.log("add new data to cache");
+            }
+          });
+
           res.json(userData);
-          console.log("add new data to cache");
         }
       });
     }
